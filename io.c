@@ -69,11 +69,16 @@ void printBoard(int dim, int **board) {
  * @param board contents of the board.
  */
 void askPlayerMove(int *x, int *y, int dim, int **board) {
+	int moved = 0;
 	do {
+		if (moved) {
+			printf("That move is not valid!\n");
+		}
 		printBoard(dim, board);
 		printf("You are playing as X. What is your move? (x, y)\n");
 		scanf("%d %d", x, y);
-	} while (validMove(*x, *y, dim, board));
+		moved = 1;
+	} while (!validMove(*x, *y, dim, board));
 }
 
 /**

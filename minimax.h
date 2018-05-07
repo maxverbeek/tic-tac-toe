@@ -1,8 +1,11 @@
 #ifndef MINIMAX_H
 #define MINIMAX_H
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
 int gg(int *winner, int dim, int **board, int mx, int my);
-void maximize();
-void minimize();
+int maximize(int *mx, int *my, int dim, int **board);
+int minimize(int *mx, int *my, int dim, int **board);
 
 #endif

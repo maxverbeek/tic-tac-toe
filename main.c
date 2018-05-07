@@ -23,7 +23,6 @@ int main(int argc, char const *argv[]) {
 	int x, y, mark;
 
 	do {
-
 		if (playerTurn) {
 			askPlayerMove(&x, &y, boardSize, board);
 			mark = -1;
@@ -36,6 +35,8 @@ int main(int argc, char const *argv[]) {
 		board[y][x] = mark;
 		playerTurn = !playerTurn;
 	} while (! gg(&winner, boardSize, board, x, y));
+
+	printBoard(boardSize, board);
 
 	if (winner == -1) {
 		printf("You win!\n");

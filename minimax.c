@@ -1,3 +1,5 @@
+#include <limits.h>
+
 #include "minimax.h"
 
 /**
@@ -68,11 +70,83 @@ int gg(int *winner, int dim, int **board, int mx, int my) {
 	return 1;
 }
 
-void maximize() {
-	// todo
+/**
+ * Chooses a move for player 1, and picks the one with the best outcome
+ * @param  mx    x coordinate of the move
+ * @param  my    y coordinate of the move
+ * @param  dim   dimension of the board
+ * @param  board contents of the board
+ * @return       the highest end result for 1
+ */
+int maximize(int *mx, int *my, int dim, int **board) {
+	int winner;
+	int opponentOptimal;
+	int maxmimum = INT_MIN; // minus inifnity
+
+	for (int y = 0; y < dim; y++) {
+		for (int x = 0; x < dim; x++) {
+			// only test for valid moves (non filled squares)
+			if (board[y][x] != 0) continue;
+
+			board[y][x] = 1;
+
+			if (gg(&winner, dim, board, x, y)) {
+				opponentOptimal = winner;
+			} else {
+				opponentOptimal = minimize(mx, my, dim, board);
+			}
+
+			if (opponentOptimal > maxmimum) {
+				*mx = x;
+				*my = y;
+				maxmimum = opponentOptimal;
+			}
+
+			// backtrack and try another move
+			board[y][x] = 0;
+		}
+	}
+
+	return maxmimum;
 }
 
-void minimize() {
-	// todo
+/**
+ * Chooses the move with the lowest possible outcome for -1
+ * @param  mx    x coordinate of the move
+ * @param  my    y coordinate of the move
+ * @param  dim   dimension of the board
+ * @param  board contents of the board
+ * @return       the least end result for -1
+ */
+int minimize(int *mx, int *my, int dim, int **board) {
+	int winner;
+	int opponentOptimal;
+	int minimum = INT_MAX; // inifnity
+
+	for (int y = 0; y < dim; y++) {
+		for (int x = 0; x < dim; x++) {
+			// only test for valid moves (non filled squares)
+			if (board[y][x] != 0) continue;
+
+			board[y][x] = -1;
+
+			if (gg(&winner, dim, board, x, y)) {
+				opponentOptimal = winner;
+			} else {
+				opponentOptimal = maximize(mx, my, dim, board);
+			}
+
+			if (opponentOptimal < minimum) {
+				*mx = x;
+				*my = y;
+				minimum = opponentOptimal;
+			}
+
+			// backtrack and try another move
+			board[y][x] = 0;
+		}
+	}
+
+	return minimum;
 }
 
