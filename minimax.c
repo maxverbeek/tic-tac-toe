@@ -1,5 +1,6 @@
 #include <limits.h>
 
+#include "io.h"
 #include "minimax.h"
 
 /**
@@ -71,82 +72,70 @@ int gg(int *winner, int dim, int **board, int mx, int my) {
 }
 
 /**
- * Chooses a move for player 1, and picks the one with the best outcome
- * @param  mx    x coordinate of the move
- * @param  my    y coordinate of the move
+ * Picks the best move for player "1"
+ * @param  bx    x-coordinate of best move
+ * @param  by    y-coordinate of best move
  * @param  dim   dimension of the board
- * @param  board contents of the board
- * @return       the highest end result for 1
+ * @param  board the board
+ * @return       the best value "1" can get.
  */
-int maximize(int *mx, int *my, int dim, int **board) {
-	int winner;
-	int opponentOptimal;
-	int maxmimum = INT_MIN; // minus inifnity
+int maximize(int *bx, int *by, int dim, int **board) {
+	// game still going
+	int highest = INT_MIN;
 
 	for (int y = 0; y < dim; y++) {
 		for (int x = 0; x < dim; x++) {
-			// only test for valid moves (non filled squares)
 			if (board[y][x] != 0) continue;
 
 			board[y][x] = 1;
-
-			if (gg(&winner, dim, board, x, y)) {
-				opponentOptimal = winner;
-			} else {
-				opponentOptimal = minimize(mx, my, dim, board);
-			}
-
-			if (opponentOptimal > maxmimum) {
-				*mx = x;
-				*my = y;
-				maxmimum = opponentOptimal;
-			}
-
-			// backtrack and try another move
+			int val = nextMove(x, y, dim, board, -1);
 			board[y][x] = 0;
+
+			if (val > highest) {
+				*bx = x;
+				*by = y;
+				highest = val;
+			}
 		}
 	}
 
-	return maxmimum;
+	return highest;
 }
 
 /**
- * Chooses the move with the lowest possible outcome for -1
- * @param  mx    x coordinate of the move
- * @param  my    y coordinate of the move
+ * Determines the next best move for side
+ * @param  lx    last x-coordinate
+ * @param  ly    last y-coordinate
  * @param  dim   dimension of the board
- * @param  board contents of the board
- * @return       the least end result for -1
+ * @param  board the board
+ * @param  side  the side that should make a move (-1 or 1)
+ * @return       the best outcome for side
  */
-int minimize(int *mx, int *my, int dim, int **board) {
+int nextMove(int lx, int ly, int dim, int **board, int side) {
 	int winner;
-	int opponentOptimal;
-	int minimum = INT_MAX; // inifnity
+	if (gg(&winner, dim, board, lx, ly)) return winner;
+
+	// side == 1  means maximizing (optimal starts at -infinity)
+	// side == -1 means minimizing (optimal starts at  infinity)
+	int optimal = side == 1 ? INT_MIN : INT_MAX;
 
 	for (int y = 0; y < dim; y++) {
 		for (int x = 0; x < dim; x++) {
-			// only test for valid moves (non filled squares)
+			// only try moves on spots that are not filled in yet
 			if (board[y][x] != 0) continue;
 
-			board[y][x] = -1;
-
-			if (gg(&winner, dim, board, x, y)) {
-				opponentOptimal = winner;
-			} else {
-				opponentOptimal = maximize(mx, my, dim, board);
-			}
-
-			if (opponentOptimal < minimum) {
-				*mx = x;
-				*my = y;
-				minimum = opponentOptimal;
-			}
-
-			// backtrack and try another move
+			// temporarily set the move, and calculate best move for opposite
+			// side. Then reset board and try a different move
+			board[y][x] = side;
+			int val = nextMove(x, y, dim, board, -1 * side);
 			board[y][x] = 0;
+
+			// if this move was optimal for "side", update the best move value.
+			if ((side == 1 && val > optimal) || (side == -1 && val < optimal)) {
+				optimal = val;
+			}
 		}
 	}
 
-	return minimum;
+	return optimal;
 }
-

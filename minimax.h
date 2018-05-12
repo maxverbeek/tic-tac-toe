@@ -6,6 +6,6 @@
 
 int gg(int *winner, int dim, int **board, int mx, int my);
 int maximize(int *mx, int *my, int dim, int **board);
-int minimize(int *mx, int *my, int dim, int **board);
+int nextMove(int lx, int ly, int dim, int **board, int side);
 
 #endif
